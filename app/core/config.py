@@ -22,9 +22,7 @@ class TelegramSettings(BaseSettings):
     TG_CHAT_ID: str = ""
 
 class OLLAMASettings(BaseSettings):
-    OLLAMA_HOST: str = "localhost"
-    OLLAMA_PORT: str = ""
-    OLLAMA_URL: str = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}"
+    OLLAMA_URL: str = "http://localhost:11434"
 
 class DBSettings(BaseSettings):
     DB_NAME: str = ""

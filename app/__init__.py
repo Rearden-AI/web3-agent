@@ -9,6 +9,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from app.logging_config import configure_logging
 configure_logging()
 
+# this is needed for alempic migrations
+from app.core.models import db_helper, Base
+
 from app.api import router as router_v1
 from app.core.config import config, redis_config
 from app.llm.modules.langgraph.nodes.answer_based_on_documentation import update_knowledge

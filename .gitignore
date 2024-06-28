@@ -1,0 +1,14 @@
+.idea
+.venv
+.envs
+.DS_Store
+
+**/__pycache__
+
+log
+
+vstore
+
+dump.rdb
+
+.env

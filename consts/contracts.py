@@ -1,0 +1,7 @@
+eigenlayer = '0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034'
+eigenlayer_spender = '0xdfB5f6CE42aAA7830E94ECFCcAd411beF4d4D5b6'
+eigenlayer_manager = "0xdfB5f6CE42aAA7830E94ECFCcAd411beF4d4D5b6"
+eigenlayer_strategy = "0x7D704507b76571a51d9caE8AdDAbBFd0ba0e63d3"
+
+lido = '0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034'
+lido_referral = '0xd6EbF043D30A7fe46D1Db32BA90a0A51207FE229'

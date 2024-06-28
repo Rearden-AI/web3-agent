@@ -1,0 +1,6 @@
+BEGIN_OF_TEXT = "<|begin_of_text|>"
+SYSTEM_MESSAGE_START = "<|start_header_id|>system<|end_header_id|>"
+USER_MESSAGE_START = "<|start_header_id|>user<|end_header_id|>"
+ASSISTANT_MESSAGE_START = "<|start_header_id|>assistant<|end_header_id|>"
+END_OF_MESSAGE = "<|eot_id|>"
+END_OF_TEXT = "<|end_of_text|>"

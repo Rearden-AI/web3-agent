@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  stage-back:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    env_file:
+      - ../.envs/.stage
+    image:
+      stage-back
+    container_name:
+      stage-back
+    ports:
+      - "127.0.0.1:5015:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      stage_rearden:
+        ipv4_address: 172.22.0.12
+    volumes:
+      - ../:/usr/src/app
+    restart: always
+    command: bash -c 'uvicorn main:app --proxy-headers --host 0.0.0.0'
+
+
+networks:
+  stage_rearden:
+    driver: bridge
+    name:
+      stage_rearden
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/16

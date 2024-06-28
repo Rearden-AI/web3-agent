@@ -11,13 +11,13 @@ async def extract_user_from_access_token(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     if not COOKIES.get(session_id) or not COOKIES[session_id].get('siwe'):
-        return await crud.select_by_wallet(
-            session=session,
-            wallet='0x5D8fdccF4Bd9B1331e66Ff2606457fbc876F28de')
-        # raise HTTPException(
-        #     status_code=status.HTTP_401_UNAUTHORIZED,
-        #     detail="You have to first sign_in",
-        # )
+        # return await crud.select_by_wallet(
+        #     session=session,
+        #     wallet='0x5D8fdccF4Bd9B1331e66Ff2606457fbc876F28de')
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You have to first sign_in",
+        )
 
     address = COOKIES[session_id]['siwe'].address
 

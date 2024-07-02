@@ -55,7 +55,7 @@ async def get_chat_by_uuid(
 
     if chat.user_id != user.id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_404_NOT_FOUND,
             # detail=errors.chats.USER_NOT_OWNER
         )
 
@@ -67,7 +67,10 @@ async def get_extended_chat_by_uuid(
         user=Depends(auth_dependencies.extract_user_from_access_token),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> ExtendedChatSchema:
+    print('here')
     chat = await get_chat_by_uuid(chat_uuid, user, session)
+
+    print(chat)
 
     chat = ExtendedChatSchema.from_orm(chat)
     history = redis_db.get(chat.uuid)

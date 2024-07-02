@@ -27,6 +27,8 @@ services:
       rearden_postgres
     expose:
       - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
     networks:
       - dev_rearden
     volumes:

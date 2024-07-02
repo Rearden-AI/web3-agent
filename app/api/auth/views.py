@@ -90,3 +90,10 @@ def verify(
     #     token=auth.token,
     #     valid_til=auth.valid_til,
     # )
+
+
+@router.post("/logout")
+async def logout(
+    session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY)
+):
+    del COOKIES[session_id]

@@ -59,18 +59,18 @@ def update_vectorstore(url_list: list):
     vector_store.persist()
 
 
-existing_urls = redis_db.lrange("knowledge_url", 0, -1)
-print(len(existing_urls))
-decoded_urls = [url.decode('utf-8') for url in existing_urls]
-if len(decoded_urls) < 1:
-    decoded_urls.extend(
-        [
-            "https://docs.neonevm.org/docs/quick_start",
-            "https://docs.starknet.io",
-            "https://docs.wormhole.com/wormhole",
-            "https://docs.sui.io"
-        ])
-update_vectorstore(decoded_urls)
+# existing_urls = redis_db.lrange("knowledge_url", 0, -1)
+# print(len(existing_urls))
+# decoded_urls = [url.decode('utf-8') for url in existing_urls]
+# if len(decoded_urls) < 1:
+#     decoded_urls.extend(
+#         [
+#             "https://docs.neonevm.org/docs/quick_start",
+#             "https://docs.starknet.io",
+#             "https://docs.wormhole.com/wormhole",
+#             "https://docs.sui.io"
+#         ])
+# update_vectorstore(decoded_urls)
 
 retriever = vector_store.as_retriever()
 
@@ -135,7 +135,12 @@ def update_knowledge():
     logger.info(f"Result of knowledge update send message: {result}")
     for value in new_urls:
         redis_db.rpush("knowledge_url", value)
-    update_vectorstore(url_list=new_urls)
+    try:
+        update_vectorstore(url_list=new_urls)
+    except Exception:
+        logging.exception(f"ERROR vectorstore creating!")
+        tg_bot.send_message(message="Update vectorstore unsuccessful!")
+    finally: tg_bot.send_message(message="Knowledge update finished!")
     tg_bot.send_message(message="Knowledge update finished!")
     return True
 

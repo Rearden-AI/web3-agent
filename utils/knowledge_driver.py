@@ -66,6 +66,7 @@ class KnowledgeDriver:
                         href = link.get("href")
                         if href and not href.startswith("#"):
                             absolute_url = urljoin(url, href)
+                            href = href.split("#")[0]
                             if absolute_url.startswith(startswith) and absolute_url not in urls_over_protocol:
                                 urls_over_protocol.add(absolute_url)
                                 # Recursively crawl the linked page

@@ -1,24 +1,32 @@
+import logging
+
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common import TimeoutException
+
+logger = logging.getLogger("Knowledge driver")
 
 
 class KnowledgeDriver:
     def __init__(self):
         self.driver = self._create_driver()
-        self.urls_for_knowledge = ["https://docs.neonevm.org/docs/quick_start",
-                                   "https://docs.starknet.io",
-                                   "https://docs.wormhole.com/wormhole",
-                                   "https://docs.sui.io"
-                                   ]
-        self.blog_urls = ["https://wormhole.com/blog",
-                          "https://neonevm.org/blog"
-                          ]
+        self.urls_for_knowledge = [
+            "https://docs.neonevm.org/docs/quick_start",
+            "https://docs.starknet.io",
+            "https://docs.wormhole.com/wormhole",
+            "https://docs.sui.io"
+        ]
+        self.blog_urls = [
+            "https://wormhole.com/blog",
+            "https://neonevm.org/blog"
+        ]
 
     def _create_driver(self):
         chromedriver_path = '/usr/bin/chromedriver'
@@ -52,29 +60,40 @@ class KnowledgeDriver:
             self.driver = self._create_driver()
         urls_over_protocol = set()
 
+        def __crawl_page(url):
+            # logger.info(f"Crawling {url}")
+            urls_over_protocol.add(url)
+
+            splited_url = url.split("/")
+            base_url = f"{splited_url[0]}//{splited_url[2]}"
+            try:
+                self.driver.get(url)
+
+                links = WebDriverWait(self.driver, 10) \
+                    .until(EC.presence_of_all_elements_located((By.TAG_NAME, "A")))
+                def __get_href(element):
+                    try:
+                        return element.get_attribute("href")
+                    except:
+                        return None
+
+                links = list(map(__get_href, links))
+                links = list(filter(lambda x: True if x else False, links))
+
+                for link in links:
+                    link = link.split("#")[0]
+                    if link.endswith('/'):
+                        link = link[:-1]
+                    if link.startswith(base_url) and link not in urls_over_protocol:
+                        __crawl_page(url=link)
+            except TimeoutException:
+                pass
+            except:
+                    logger.exception("Failed to crawl")
+
         for link in self.urls_for_knowledge:
-            splited_url = link.split("/")
-            startswith = f"{splited_url[0]}//{splited_url[2]}"
-
-            def __crawl_page(url):
-                try:
-                    self.driver.get(url)
-                    self.driver.implicitly_wait(10)
-                    soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-                    links = soup.find_all("a")
-                    for link in links:
-                        href = link.get("href")
-                        if href and not href.startswith("#"):
-                            absolute_url = urljoin(url, href)
-                            href = href.split("#")[0]
-                            if absolute_url.startswith(startswith) and absolute_url not in urls_over_protocol:
-                                urls_over_protocol.add(absolute_url)
-                                # Recursively crawl the linked page
-                                __crawl_page(absolute_url)
-                except Exception as e:
-                    print(f"Error {str(e)}")
-
             __crawl_page(link)
+
         return urls_over_protocol
 
     def _update_blog_posts(self):

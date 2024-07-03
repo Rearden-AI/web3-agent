@@ -34,7 +34,7 @@ class KnowledgeDriver:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        return webdriver.Chrome(service=ChromeService(chromedriver_path), options=chrome_options) # ChromeDriverManager().install()
+        return webdriver.Chrome(service=ChromeService(chromedriver_path), options=chrome_options)
 
     def is_driver_started(self):
         try:
@@ -84,7 +84,7 @@ class KnowledgeDriver:
                     link = link.split("#")[0]
                     if link.endswith('/'):
                         link = link[:-1]
-                    if link.startswith(base_url) and link not in urls_over_protocol:
+                    if link.startswith(base_url) and link not in urls_over_protocol and not link.endswith('.pdf'):
                         __crawl_page(url=link)
             except TimeoutException:
                 pass

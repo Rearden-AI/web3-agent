@@ -61,6 +61,8 @@ services:
       - ${CHROMA_PORT}:${CHROMA_PORT}
     networks:
       - dev_rearden
+    volumes:
+      - ../chroma:/chroma/chroma
     restart: always
     hostname: chroma
 

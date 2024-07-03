@@ -1,5 +1,4 @@
 import logging
-import os
 
 import chromadb
 
@@ -21,19 +20,15 @@ logger = logging.getLogger('answer_based_on_documentation')
 
 model = get_model()
 
-persist_directory = os.path.realpath(os.path.join(os.getcwd(), 'vstore'))
-
 client = chromadb.HttpClient(
     host=chroma_settings.CHROMA_HOST,
     port=chroma_settings.CHROMA_PORT
 )
-# print(persistent_client.get_max_batch_size())
 
 vector_store = Chroma(
     client=client,
     collection_name="knowledge",
-    embedding_function=FastEmbedEmbeddings(cache_dir='/tmp/testdir'),
-    persist_directory=persist_directory
+    embedding_function=FastEmbedEmbeddings(cache_dir='/tmp/testdir')
 )
 
 # vector_store.delete_collection()
@@ -42,7 +37,7 @@ sources_in_store = list(set(map(lambda x: x['source'], vector_store.get()['metad
 
 
 def update_vectorstore(url_list: list):
-    print(len(url_list))
+    logger.info(f"Updating vectorstore with {len(url_list)} links")
 
     docs = AsyncHtmlLoader(web_path=url_list).load()
 
@@ -52,25 +47,22 @@ def update_vectorstore(url_list: list):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
     chunks = text_splitter.transform_documents(docs)
 
-    print('Start add to vectorstore')
+    logger.info('Start add to vectorstore')
     vector_store.add_documents(chunks)
-    print('Finisdh add to vectorstore')
-
-    vector_store.persist()
+    logger.info('Finisdh add to vectorstore')
 
 
-# existing_urls = redis_db.lrange("knowledge_url", 0, -1)
-# print(len(existing_urls))
-# decoded_urls = [url.decode('utf-8') for url in existing_urls]
-# if len(decoded_urls) < 1:
-#     decoded_urls.extend(
-#         [
-#             "https://docs.neonevm.org/docs/quick_start",
-#             "https://docs.starknet.io",
-#             "https://docs.wormhole.com/wormhole",
-#             "https://docs.sui.io"
-#         ])
-# update_vectorstore(decoded_urls)
+existing_urls = redis_db.lrange("knowledge_url", 0, -1)
+decoded_urls = [url.decode('utf-8') for url in existing_urls]
+if len(decoded_urls) < 1:
+    decoded_urls.extend(
+        [
+            "https://docs.neonevm.org/docs/quick_start",
+            "https://docs.starknet.io",
+            "https://docs.wormhole.com/wormhole",
+            "https://docs.sui.io"
+        ])
+update_vectorstore(decoded_urls)
 
 retriever = vector_store.as_retriever()
 
@@ -145,6 +137,6 @@ def update_knowledge():
     return True
 
 
-logger.info('Updating knowledgebase')
-update_knowledge()
-logger.info('Finished updating')
+# logger.info('Updating knowledgebase')
+# update_knowledge()
+# logger.info('Finished updating')

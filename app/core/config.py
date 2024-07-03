@@ -7,7 +7,7 @@ class Config(BaseSettings):
     api_v1_prefix: str = "/api/v1"
 
     APP_DOMAIN: str = "localhost"
-    DEV_DOMAIN: str = None
+    DEV_DOMAIN: str | None = None
     GOOGLE_API_KEY: str = ""
     WEB3_PROVIDER: str = "localhost"
 

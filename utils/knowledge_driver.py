@@ -1,3 +1,4 @@
+import json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from selenium import webdriver
@@ -9,7 +10,7 @@ from selenium.common.exceptions import NoSuchElementException, ElementClickInter
 
 
 class KnowledgeDriver:
-    def __init__(self):
+    def __init__(self, discord_auth: str):
         self.driver = self._create_driver()
         self.urls_for_knowledge = ["https://docs.neonevm.org/docs/quick_start",
                                    "https://docs.starknet.io",
@@ -19,6 +20,11 @@ class KnowledgeDriver:
         self.blog_urls = ["https://wormhole.com/blog",
                           "https://neonevm.org/blog"
                           ]
+        self.discord_auth = discord_auth
+        self.discord_urls = [{"name": "wormhole",
+                              "url": "https://discord.com/api/v9/channels/1075310129798459492/threads/search?archived=true&sort_by=last_message_time&sort_order=desc&limit=25&tag_setting=match_some&offset=0"},
+                             {"name": "neon",
+                              "url": "https://discord.com/api/v9/channels/1176488632933163078/messages?limit=50"}]
 
     def _create_driver(self):
         chromedriver_path = '/usr/bin/chromedriver'
@@ -26,7 +32,8 @@ class KnowledgeDriver:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        return webdriver.Chrome(service=ChromeService(chromedriver_path), options=chrome_options) # ChromeDriverManager().install()
+        return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),
+                                options=chrome_options)  # ChromeDriverManager().install()
 
     def is_driver_started(self):
         try:
@@ -103,8 +110,34 @@ class KnowledgeDriver:
 
         return blog_posts
 
+    def _update_discord_faq(self):
+        if not self.is_driver_started():
+            self.driver = self._create_driver()
+        self.driver.execute_cdp_cmd('Network.enable', {})
+        self.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'Authorization': self.discord_auth
+            }
+        })
+        for protocol in self.discord_urls:
+            self.driver.get(protocol.get('url'))
+            self.driver.implicitly_wait(10)  # Wait for the page to load
+            page = self.driver.find_elements(By.CSS_SELECTOR, 'pre')  # Replace with actual CSS selector for threads
+            data = json.loads(page[0].text)
+            if protocol.get('name') in ('wormhole'):
+                threads = data.get('threads')
+                answer = data.get('first_messages')
+                for i in range(len(threads)):
+                    print(f"thread: {threads[i].get('name')}, answer: {answer[i].get('content')}")
+            elif protocol.get('name') in ('neon'):
+                content = data[0].get('content')
+                embeds = data[0].get('embeds')
+                print(f"CONTENT {content}")
+                for embed in embeds:
+                    print(f"Answer: {embed.get('description')}")
 
 if __name__ == "__main__":
-    kn = KnowledgeDriver()
-    urls = kn.update_all_data()
+    discord_auth = ""
+    kn = KnowledgeDriver(discord_auth=discord_auth)
+    urls = kn._update_discord_faq()
     print(urls)

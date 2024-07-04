@@ -8,6 +8,6 @@ redis_db = redis.Redis(host=redis_config.REDIS_HOST, port=redis_config.REDIS_POR
 web3 = Web3(HTTPProvider(config.WEB3_PROVIDER))
 
 # -------- Initialize knowledge driver ----------------
-kd = knowledge_driver.KnowledgeDriver()
+kd = knowledge_driver.KnowledgeDriver(discord_auth=config.DISCORD_AUTH)
 # -------- Initialize Telegram Bot --------------------
 tg_bot = telegram_bot.TelegramBot(token=tg_conf.TG_TOKEN, chat=tg_conf.TG_CHAT_ID)

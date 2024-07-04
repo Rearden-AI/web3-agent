@@ -1,3 +1,4 @@
+import os
 import json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -32,7 +33,7 @@ class KnowledgeDriver:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),
+        return webdriver.Chrome(service=ChromeService(chromedriver_path),
                                 options=chrome_options)  # ChromeDriverManager().install()
 
     def is_driver_started(self):
@@ -46,8 +47,9 @@ class KnowledgeDriver:
     def update_all_data(self):
         urls = self._update_all_urls()
         blog_posts = self._update_blog_posts()
+        is_faq_updated = self._update_discord_faq()
         self.driver.close()
-        return urls.union(blog_posts)
+        return urls.union(blog_posts), is_faq_updated
 
     def _read_urls_from_file(self, file_path):
         with open(file_path, "r") as file:
@@ -124,17 +126,25 @@ class KnowledgeDriver:
             self.driver.implicitly_wait(10)  # Wait for the page to load
             page = self.driver.find_elements(By.CSS_SELECTOR, 'pre')  # Replace with actual CSS selector for threads
             data = json.loads(page[0].text)
-            if protocol.get('name') in ('wormhole'):
-                threads = data.get('threads')
-                answer = data.get('first_messages')
-                for i in range(len(threads)):
-                    print(f"thread: {threads[i].get('name')}, answer: {answer[i].get('content')}")
-            elif protocol.get('name') in ('neon'):
-                content = data[0].get('content')
-                embeds = data[0].get('embeds')
-                print(f"CONTENT {content}")
-                for embed in embeds:
-                    print(f"Answer: {embed.get('description')}")
+            if isinstance(data, dict) and data.get("message") == '401: Unauthorized':
+                return False
+            protocol_name = protocol.get('name')
+            path = os.path.join(f"{protocol_name}_discord.txt")
+            with open(path, "w") as file:
+                file.write(f"Protocol: {protocol_name}")
+                if protocol_name in ('wormhole'):
+                    threads = data.get('threads')
+                    answer = data.get('first_messages')
+                    for i in range(len(threads)):
+                        file.write(f"thread: {threads[i].get('name')}, answer: {answer[i].get('content')}")
+
+                elif protocol_name in ('neon'):
+                    content = data[0].get('content')
+                    embeds = data[0].get('embeds')
+                    file.write(f"\n Content: {content}")
+                    for embed in embeds:
+                        file.write(f"{embed.get('description')}")
+        return True
 
 if __name__ == "__main__":
     discord_auth = ""

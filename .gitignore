@@ -12,3 +12,5 @@ vstore
 dump.rdb
 
 .env
+
+chroma

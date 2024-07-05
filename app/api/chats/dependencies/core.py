@@ -26,6 +26,8 @@ from app.crypto.eth.investments import investment_actions as investment_actions_
 from app.crypto.eth_holesky.investments import investment_actions as investment_actions_holesky
 from app.crypto.services.tokens_keeper import get_token_by_symbol
 
+from app.core.config import superadmin_settings
+
 
 async def get_chat_by_id(
         chat_id: Annotated[int, Path],
@@ -43,7 +45,7 @@ async def get_chat_by_id(
 
 async def get_chat_by_uuid(
         chat_uuid: Annotated[str, Path],
-        user=Depends(auth_dependencies.extract_user_from_access_token),
+        user: User = Depends(auth_dependencies.extract_user_from_access_token),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Chat:
     chat = await crud.select_by_uuid(session=session, chat_uuid=chat_uuid)
@@ -53,7 +55,7 @@ async def get_chat_by_uuid(
             # detail=errors.chats.PROJECT_NOT_FOUND
         )
 
-    if chat.user_id != user.id:
+    if user.wallet != superadmin_settings.SUPERADMIN_WALLET_ADDRESS and chat.user_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             # detail=errors.chats.USER_NOT_OWNER

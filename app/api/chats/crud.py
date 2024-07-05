@@ -13,12 +13,14 @@ from ...core.models.base import State
 
 
 async def get_all(
-        session: AsyncSession, pagination_query: PaginatedParams, user_id: int
+        session: AsyncSession, 
+        pagination_query: PaginatedParams, 
+        user_id: int
 ) -> PaginatedResponse[ChatSchema]:
     stmt = (
         select(Chat)
         .filter(Chat.state != State.deleted)
-        .filter(Chat.user_id == user_id)
+        .filter(not user_id or Chat.user_id == user_id)
         .order_by(Chat.created_at.desc())
     )
     response, data = await paginate(

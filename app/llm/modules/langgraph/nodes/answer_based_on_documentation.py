@@ -52,17 +52,17 @@ def update_vectorstore(url_list: list):
     logger.info('Finisdh add to vectorstore')
 
 
-existing_urls = redis_db.lrange("knowledge_url", 0, -1)
-decoded_urls = [url.decode('utf-8') for url in existing_urls]
-if len(decoded_urls) < 1:
-    decoded_urls.extend(
-        [
-            "https://docs.neonevm.org/docs/quick_start",
-            "https://docs.starknet.io",
-            "https://docs.wormhole.com/wormhole",
-            "https://docs.sui.io"
-        ])
-update_vectorstore(decoded_urls)
+# existing_urls = redis_db.lrange("knowledge_url", 0, -1)
+# decoded_urls = [url.decode('utf-8') for url in existing_urls]
+# if len(decoded_urls) < 1:
+#     decoded_urls.extend(
+#         [
+#             "https://docs.neonevm.org/docs/quick_start",
+#             "https://docs.starknet.io",
+#             "https://docs.wormhole.com/wormhole",
+#             "https://docs.sui.io"
+#         ])
+# update_vectorstore(decoded_urls)
 
 retriever = vector_store.as_retriever()
 

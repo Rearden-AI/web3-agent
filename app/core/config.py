@@ -7,6 +7,7 @@ class Config(BaseSettings):
     api_v1_prefix: str = "/api/v1"
 
     APP_DOMAIN: str = "localhost"
+    DEV_DOMAIN: str | None = None
     GOOGLE_API_KEY: str = ""
     WEB3_PROVIDER: str = "localhost"
     DISCORD_AUTH: str = ""
@@ -35,9 +36,19 @@ class DBSettings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str = f'postgresql+asyncpg://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
     db_echo: bool = False
 
+class ChromaSettings(BaseSettings):
+    CHROMA_HOST: str = "localhost"
+    CHROMA_PORT: int = 8000
+
+
+class SuperadminSettings(BaseSettings):
+    SUPERADMIN_WALLET_ADDRESS: str = ""
+
 
 config = Config()
 tg_conf = TelegramSettings()
 db_config = DBSettings()
 redis_config = RedisSettings()
 ollama_config = OLLAMASettings()
+chroma_settings = ChromaSettings()
+superadmin_settings = SuperadminSettings()

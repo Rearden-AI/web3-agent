@@ -4,6 +4,7 @@ from app.llm.utils import get_initial_state
 
 from .routers import categotize_user_action_router
 from .routers import categorize_user_message_router
+from .routers import action_result_router
 
 from .nodes import categorize_user_request
 from .nodes import answer_based_on_documentation
@@ -43,7 +44,8 @@ workflow.add_conditional_edges(
     {
         'transfer': 'transfer_action',
         'swap': 'swap_action',
-        'invest': 'invest_action'
+        'invest': 'invest_action',
+        'off_topic': 'answer_based_on_documentation'
     }
 )
 
@@ -53,9 +55,21 @@ workflow.add_edge('answer_based_on_documentation', END)
 # workflow.add_edge('execute_action', END)
 # workflow.add_edge('dummy', END)
 
-workflow.add_edge('swap_action', END)
 workflow.add_edge('invest_action', END)
-workflow.add_edge('transfer_action', END)
+workflow.add_conditional_edges(
+    'swap_action', 
+    action_result_router,
+    {
+        'finish': END,
+        'docs': 'answer_based_on_documentation'
+    })
+workflow.add_conditional_edges(
+    'transfer_action', 
+    action_result_router,
+    {
+        'finish': END,
+        'docs': 'answer_based_on_documentation'
+    })
 
 app = workflow.compile()
 

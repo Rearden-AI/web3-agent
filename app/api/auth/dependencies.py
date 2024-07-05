@@ -3,8 +3,6 @@ import pickle
 from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from siwe import ISO8601Datetime
-
 from app.core.modules_factory import redis_db
 from app.core.models import db_helper, User
 from . import crud

@@ -108,7 +108,7 @@ async def process_chat_request(
             detail="No needed data received",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     if data_in.generate_code:
         timestamp=int(datetime.datetime.now().timestamp() * 1000)
         chat.history.append(

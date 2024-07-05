@@ -5,7 +5,7 @@ from ....services.tokens_keeper import get_token_by_symbol
 from ....constants.links import ETH_ICON_URL
 
 
-def get_transfer_data_for_chain(symbol: str, receiver: str, amount: float, evm_chain: EvmChain):
+def get_transfer_data_for_chain(symbol: str, receiver: str, amount: float, evm_chain: EvmChain, **params):
     token = get_token_by_symbol(symbol) if symbol != "ETH" else None
 
     transaction_data = __get_transaction_data(symbol, receiver, amount, token, evm_chain)
@@ -22,7 +22,7 @@ def get_transfer_data_for_chain(symbol: str, receiver: str, amount: float, evm_c
         ],
         "transaction_data": transaction_data,
         "balance_data": {
-            "coin": "native" if symbol == "ETH" else token.address
+            "coin": "native" if symbol == "ETH" else token.token_data[evm_chain].address
         }
     }
 

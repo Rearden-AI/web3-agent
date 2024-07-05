@@ -8,8 +8,8 @@ logger = logging.getLogger('invest_action')
 
 def invest_action(state: ChatMessageFlowState):
     logger.info('Processing investment action')
-    
-    user_message = state['user_message']
+
+    # user_message = state['user_message']
     num_steps = int(state['num_steps'])
     num_steps += 1
 

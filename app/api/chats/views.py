@@ -27,8 +27,6 @@ async def get_all_chats(
         pagination_query: PaginatedParams = Depends(),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    logger.info(f"{user.wallet} {superadmin_settings.SUPERADMIN_WALLET_ADDRESS}")  
-
     res = await crud.get_all(
         session=session,
         pagination_query=pagination_query,

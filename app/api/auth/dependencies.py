@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.modules_factory import redis_db
 from app.core.models import db_helper, User
 from . import crud
-from .views import COOKIE_SESSION_ID_KEY
+from .constants import COOKIE_SESSION_ID_KEY
 
 
 async def extract_user_from_access_token(

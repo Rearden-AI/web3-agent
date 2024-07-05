@@ -40,9 +40,14 @@ class ChromaSettings(BaseSettings):
     CHROMA_PORT: int = 8000
 
 
+class SuperadminSettings(BaseSettings):
+    SUPERADMIN_WALLET_ADDRESS: str = ""
+
+
 config = Config()
 tg_conf = TelegramSettings()
 db_config = DBSettings()
 redis_config = RedisSettings()
 ollama_config = OLLAMASettings()
 chroma_settings = ChromaSettings()
+superadmin_settings = SuperadminSettings()

@@ -1,12 +1,16 @@
 # pylint: disable=raise-missing-from
 import pickle
 import logging
-from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status
+from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status, Depends
 from fastapi.responses import PlainTextResponse
 from siwe import generate_nonce, SiweMessage
 
 from app.core.modules_factory import redis_db
 from app.api.auth.utils import generate_session_id
+from app.core.models import User
+
+from . import dependencies
+from .constants import COOKIE_SESSION_ID_KEY
 
 logger = logging.getLogger("auth/views")
 
@@ -14,9 +18,6 @@ router = APIRouter(
     tags=["Authorization"],
     responses={404: {"description": "Not found"}},
 )
-
-# COOKIES: dict[str, dict[str, Any]] = {}
-COOKIE_SESSION_ID_KEY = "rearden-session-id"
 
 
 @router.get(
@@ -106,3 +107,10 @@ async def logout(
         redis_db.delete(session_id)
     except:
         pass
+
+
+@router.get("/me")
+async def me(
+    user: User = Depends(dependencies.extract_user_from_access_token),
+):
+    return user.wallet

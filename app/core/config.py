@@ -16,6 +16,8 @@ class Config(BaseSettings):
 class RedisSettings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: str = ""
+    REDIS_USER: str = ""
+    REDIS_PASSWORD: str = ""
     REDIS_URL: str = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
 

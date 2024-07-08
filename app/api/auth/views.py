@@ -1,11 +1,16 @@
 # pylint: disable=raise-missing-from
+import pickle
 import logging
-from typing import Any
-from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status
+from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status, Depends
 from fastapi.responses import PlainTextResponse
 from siwe import generate_nonce, SiweMessage
 
+from app.core.modules_factory import redis_db
 from app.api.auth.utils import generate_session_id
+from app.core.models import User
+
+from . import dependencies
+from .constants import COOKIE_SESSION_ID_KEY
 
 logger = logging.getLogger("auth/views")
 
@@ -13,9 +18,6 @@ router = APIRouter(
     tags=["Authorization"],
     responses={404: {"description": "Not found"}},
 )
-
-COOKIES: dict[str, dict[str, Any]] = {}
-COOKIE_SESSION_ID_KEY = "rearden-session-id"
 
 
 @router.get(
@@ -29,9 +31,11 @@ async def get_nonce(
     try:
         session_id = generate_session_id()
 
-        COOKIES[session_id] = {
-            'nonce': generate_nonce()
+        nonce = generate_nonce()
+        session_info = {
+            'nonce': nonce
         }
+        redis_db.set(session_id, pickle.dumps(session_info))
 
         response.set_cookie(
             key=COOKIE_SESSION_ID_KEY,
@@ -39,7 +43,7 @@ async def get_nonce(
             samesite='none',
             secure=True)
 
-        return COOKIES[session_id]['nonce']
+        return nonce
     except Exception as e:
         logger.error(e)
 
@@ -57,13 +61,16 @@ def verify(
 ):
     try:
         siwe_message = SiweMessage.from_message(message)
+
+        session_info = pickle.loads(redis_db.get(session_id))
         siwe_message.verify(
             signature=signature,
-            nonce=COOKIES[session_id]['nonce']
+            nonce=session_info['nonce']
         )
 
-        COOKIES[session_id]['siwe'] = siwe_message
-        COOKIES[session_id]['expires'] = siwe_message.expiration_time
+        session_info['siwe'] = siwe_message
+        redis_db.set(session_id, pickle.dumps(session_info))
+        # COOKIES[session_id]['expires'] = int(time.time())
 
         return True
     except Exception as e:
@@ -96,4 +103,14 @@ def verify(
 async def logout(
     session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY)
 ):
-    del COOKIES[session_id]
+    try:
+        redis_db.delete(session_id)
+    except:
+        pass
+
+
+@router.get("/me")
+async def me(
+    user: User = Depends(dependencies.extract_user_from_access_token),
+):
+    return user.wallet

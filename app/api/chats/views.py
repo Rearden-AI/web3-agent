@@ -1,14 +1,20 @@
+import logging
+
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import dependencies as auth_dependencies
-from app.core.models import db_helper, Chat
+from app.core.models import db_helper, Chat, User
 from utils.paginated_response import PaginatedResponse, PaginatedParams
 from . import crud
 from . import dependencies
 from .schemas import ChatSchema, ExtendedChatSchema, ChatUpdatePartial
 
+from app.core.config import superadmin_settings
+
 router = APIRouter(tags=["Chats"])
+
+logger = logging.getLogger('chats/views')
 
 
 @router.get(
@@ -17,11 +23,15 @@ router = APIRouter(tags=["Chats"])
     response_model=PaginatedResponse[ChatSchema],
 )
 async def get_all_chats(
-        user=Depends(auth_dependencies.extract_user_from_access_token),
+        user: User = Depends(auth_dependencies.extract_user_from_access_token),
         pagination_query: PaginatedParams = Depends(),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
-    res = await crud.get_all(session=session, pagination_query=pagination_query, user_id=user.id)
+    res = await crud.get_all(
+        session=session,
+        pagination_query=pagination_query,
+        user_id=user.id if user.wallet != superadmin_settings.SUPERADMIN_WALLET_ADDRESS else None
+    )
     return res
 
 

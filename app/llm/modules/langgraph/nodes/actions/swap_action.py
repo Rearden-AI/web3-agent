@@ -43,7 +43,7 @@ chain = (
 
 def swap_action(state: ChatMessageFlowState):
     logger.info('Processing swap action')
-    
+
     num_steps = int(state['num_steps'])
     num_steps += 1
 
@@ -54,30 +54,37 @@ def swap_action(state: ChatMessageFlowState):
     tokens = get_tokens()
     tokens_list = '\n'.join(map(lambda x: f"{x.name} ({x.symbol})", tokens))
 
-    swap_params = chain.invoke({
-        "tokens_list": tokens_list,
-        "user_message": user_message
-    })
+    try:
+        swap_params = chain.invoke({
+            "tokens_list": tokens_list,
+            "user_message": user_message
+        })
 
-    action_data = crypto.get_transaction_data(
-        chain_id=chain_id,
-        data={
-            "action": "swap",
-            "params": {
-                "side": swap_params["side"],
-                "symbol": swap_params["symbol"],
-                "user_address": state["user_address"]
+        action_data = crypto.get_transaction_data(
+            chain_id=chain_id,
+            data={
+                "action": "swap",
+                "params": {
+                    "side": swap_params["side"],
+                    "symbol": swap_params["symbol"],
+                    "user_address": state["user_address"]
+                }
             }
+        )
+
+        return {
+            "num_steps": num_steps,
+            "response": "Processing swap action...",
+            "action_processed_successfully": True,
+            "actions": [
+                {
+                    "id": 0,
+                    "action_data": action_data
+                }
+            ]
         }
-    )
-
-    return {
-        "num_steps": num_steps,
-        "response": "Processing swap action...",
-        "actions": [
-            {
-                "id": 0,
-                "action_data": action_data
-            }
-        ]
-    }
+    except:
+        return {
+            "num_steps": num_steps,
+            "action_processed_successfully": False
+        }

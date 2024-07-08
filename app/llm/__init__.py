@@ -5,6 +5,7 @@ from .classes.llm_response import LlmResponse
 
 logger = logging.getLogger('llm')
 
+
 def process_user_message(
         message: str,
         chain_id: int,

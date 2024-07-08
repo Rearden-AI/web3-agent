@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   redis:
     image: redis/redis-stack:latest
@@ -7,6 +5,7 @@ services:
       redis
     ports:
       - "127.0.0.1:8001:8001"
+      - ${REDIS_PORT}:${REDIS_PORT}
     expose:
       - ${REDIS_PORT}
     restart: always
@@ -53,6 +52,20 @@ services:
     restart: always
     hostname: ollama
 
+  chroma:
+    image: chromadb/chroma
+    container_name: chroma
+    expose:
+      - ${CHROMA_PORT}
+    ports:
+      - ${CHROMA_PORT}:${CHROMA_PORT}
+    networks:
+      - dev_rearden
+    volumes:
+      - ../chroma:/chroma/chroma
+    restart: always
+    hostname: chroma
+
   dev-back:
     build:
       context: ../
@@ -72,7 +85,7 @@ services:
     volumes:
       - ../:/usr/src/app
     restart: always
-    command: bash -c './auto-migration.sh dev && uvicorn main:app --proxy-headers --host 0.0.0.0'
+    command: bash -c 'uvicorn main:app --proxy-headers --host 0.0.0.0'
     depends_on:
       - redis
       - postgres

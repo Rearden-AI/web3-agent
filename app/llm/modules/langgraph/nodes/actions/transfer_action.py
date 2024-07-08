@@ -102,21 +102,28 @@ def transfer_action(state: ChatMessageFlowState):
 
     transfer_params = chain.invoke(user_message)
 
-    action_data = get_transaction_data(
-        chain_id=state["chain_id"],
-        data={
-            "action": "transfer",
-            "params": transfer_params
-        }
-    )
-
-    return {
-        "num_steps": num_steps, 
-        "response": 'Processing transfer action', 
-        "actions": [
-            {
-                "id": 0,
-                "action_data": action_data
+    try:
+        action_data = get_transaction_data(
+            chain_id=state["chain_id"],
+            data={
+                "action": "transfer",
+                "params": transfer_params
             }
-        ]
-    }
+        )
+
+        return {
+            "num_steps": num_steps, 
+            "response": 'Processing transfer action', 
+            "action_processed_successfully": True,
+            "actions": [
+                {
+                    "id": 0,
+                    "action_data": action_data
+                }
+            ]
+        }
+    except:
+        return {
+            "num_steps": num_steps,
+            "action_processed_successfully": False
+        }

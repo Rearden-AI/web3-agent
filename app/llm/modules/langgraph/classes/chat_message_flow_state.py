@@ -6,6 +6,7 @@ class ChatMessageFlowState(TypedDict):
     user_message: str
     message_category: str
     action_category: str
+    action_processed_successfully: bool
     num_steps: int
     response: str
     actions: list[Any]

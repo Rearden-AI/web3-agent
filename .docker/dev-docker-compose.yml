@@ -3,6 +3,8 @@ services:
     image: redis/redis-stack:latest
     container_name:
       redis
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --user ${REDIS_USER} on >${REDIS_PASSWORD} ~* allcommands --user default off nopass nocommands"
     ports:
       - "127.0.0.1:8001:8001"
       - ${REDIS_PORT}:${REDIS_PORT}
@@ -98,4 +100,4 @@ volumes:
 
 networks:
   dev_rearden: {}
-
+  

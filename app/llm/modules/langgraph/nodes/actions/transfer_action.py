@@ -93,14 +93,14 @@ chain = (
 )
 
 
-def transfer_action(state: ChatMessageFlowState):
+async def transfer_action(state: ChatMessageFlowState):
     logger.info('Processing transfer action')
 
     user_message = state['user_message']
     num_steps = int(state['num_steps'])
     num_steps += 1
 
-    transfer_params = chain.invoke(user_message)
+    transfer_params = await chain.ainvoke(user_message)
 
     try:
         action_data = get_transaction_data(

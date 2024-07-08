@@ -193,10 +193,15 @@ async def process_chat_request(
             contains_strategy_previews=[]
         )
     else:
-        _user_message = {"role": "user", "content": data_in.message, "parts": [data_in.message], "timestamp": data_in.timestamp}
+        _user_message = {
+            "role": "user",
+            "content": data_in.message,
+            "parts": [data_in.message],
+            "timestamp": data_in.timestamp
+        }
         chat.history.append(_user_message)
 
-        llm_response = process_user_message(
+        llm_response = await process_user_message(
             message=data_in.message,
             chain_id=data_in.chain_id,
             address=user.wallet

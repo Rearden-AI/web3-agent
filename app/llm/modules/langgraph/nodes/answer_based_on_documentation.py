@@ -101,14 +101,14 @@ chain = (
 )
 
 
-def answer_based_on_documentation(state: ChatMessageFlowState):
+async def answer_based_on_documentation(state: ChatMessageFlowState):
     logger.info('Searching in documentation...')
 
     user_message = state['user_message']
     num_steps = int(state['num_steps'])
     num_steps += 1
 
-    llm_response = chain.invoke(user_message)
+    llm_response = await chain.ainvoke(user_message)
 
     return {"num_steps": num_steps, "response": llm_response}
 

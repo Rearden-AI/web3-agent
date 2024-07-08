@@ -7,7 +7,7 @@ from langchain_core.runnables import RunnablePassthrough, Runnable
 from langchain_core.prompts import PromptTemplate
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import AsyncHtmlLoader
+from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoader
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -40,10 +40,13 @@ def update_vectorstore(url_list: list):
     logger.info(f"Updating vectorstore with {len(url_list)} links")
 
     docs = AsyncHtmlLoader(web_path=url_list).load()
+    knowledge_dir_path = os.path.realpath(os.path.join('app', "llm", "modules", "knowledge"))
+    txt_docs = DirectoryLoader(path=knowledge_dir_path).load()
 
     html2text = Html2TextTransformer()
     docs = html2text.transform_documents(docs)
 
+    docs += txt_docs
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
     chunks = text_splitter.transform_documents(docs)
 
@@ -113,7 +116,9 @@ def answer_based_on_documentation(state: ChatMessageFlowState):
 def update_knowledge():
     tg_bot.send_message(message="Knowledge update started!")
     logger.info('Start kd update all date')
-    urls = kd.update_all_data()
+    urls, is_faq_updated = kd.update_all_data()
+    if not is_faq_updated:
+        tg_bot.send_message(message="Can't update FAQ. Auth token expired!")
     logger.debug('Finish kd update all data')
     existing_urls = redis_db.lrange("knowledge_url", 0, -1)
     decoded_urls = [url.decode('utf-8') for url in existing_urls]

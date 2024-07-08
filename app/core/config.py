@@ -10,6 +10,7 @@ class Config(BaseSettings):
     DEV_DOMAIN: str | None = None
     GOOGLE_API_KEY: str = ""
     WEB3_PROVIDER: str = "localhost"
+    DISCORD_AUTH: str = ""
 
 
 class RedisSettings(BaseSettings):

@@ -111,3 +111,5 @@ selenium==4.21.0
 fake_useragent==1.5.1
 jsonpickle==3.2.1
 siwe==4.1.0
+psutil
+unstructured

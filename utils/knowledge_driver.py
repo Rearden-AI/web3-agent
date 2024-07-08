@@ -1,7 +1,7 @@
+import os
+import json
 import logging
-
 from bs4 import BeautifulSoup
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -15,18 +15,21 @@ logger = logging.getLogger("Knowledge driver")
 
 
 class KnowledgeDriver:
-    def __init__(self):
+    def __init__(self, discord_auth: str):
         self.driver = self._create_driver()
-        self.urls_for_knowledge = [
-            "https://docs.neonevm.org/docs/quick_start",
-            "https://docs.starknet.io",
-            "https://docs.wormhole.com/wormhole",
-            "https://docs.sui.io"
-        ]
-        self.blog_urls = [
-            "https://wormhole.com/blog",
-            "https://neonevm.org/blog"
-        ]
+        self.urls_for_knowledge = ["https://docs.neonevm.org/docs/quick_start",
+                                   "https://docs.starknet.io",
+                                   "https://docs.wormhole.com/wormhole",
+                                   "https://docs.sui.io"
+                                   ]
+        self.blog_urls = ["https://wormhole.com/blog",
+                          "https://neonevm.org/blog"
+                          ]
+        self.discord_auth = discord_auth
+        self.discord_urls = [{"name": "wormhole",
+                              "url": "https://discord.com/api/v9/channels/1075310129798459492/threads/search?archived=true&sort_by=last_message_time&sort_order=desc&limit=25&tag_setting=match_some&offset=0"},
+                             {"name": "neon",
+                              "url": "https://discord.com/api/v9/channels/1176488632933163078/messages?limit=50"}]
 
     def _create_driver(self):
         chromedriver_path = '/usr/bin/chromedriver'
@@ -34,6 +37,7 @@ class KnowledgeDriver:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+
         return webdriver.Chrome(service=ChromeService(chromedriver_path), options=chrome_options)
 
     def is_driver_started(self):
@@ -47,8 +51,9 @@ class KnowledgeDriver:
     def update_all_data(self):
         urls = self._update_all_urls()
         blog_posts = self._update_blog_posts()
+        is_faq_updated = self._update_discord_faq()
         self.driver.close()
-        return urls.union(blog_posts)
+        return urls.union(blog_posts), is_faq_updated
 
     def _read_urls_from_file(self, file_path):
         with open(file_path, "r") as file:
@@ -123,8 +128,42 @@ class KnowledgeDriver:
 
         return blog_posts
 
+    def _update_discord_faq(self):
+        if not self.is_driver_started():
+            self.driver = self._create_driver()
+        self.driver.execute_cdp_cmd('Network.enable', {})
+        self.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'Authorization': self.discord_auth
+            }
+        })
+        for protocol in self.discord_urls:
+            self.driver.get(protocol.get('url'))
+            self.driver.implicitly_wait(10)  # Wait for the page to load
+            page = self.driver.find_elements(By.CSS_SELECTOR, 'pre')  # Replace with actual CSS selector for threads
+            data = json.loads(page[0].text)
+            if isinstance(data, dict) and data.get("message") == '401: Unauthorized':
+                return False
+            protocol_name = protocol.get('name')
+            path = os.path.join(f"{protocol_name}_discord.txt")
+            with open(path, "w") as file:
+                file.write(f"Protocol: {protocol_name}")
+                if protocol_name in ('wormhole'):
+                    threads = data.get('threads')
+                    answer = data.get('first_messages')
+                    for i in range(len(threads)):
+                        file.write(f"thread: {threads[i].get('name')}, answer: {answer[i].get('content')}")
+
+                elif protocol_name in ('neon'):
+                    content = data[0].get('content')
+                    embeds = data[0].get('embeds')
+                    file.write(f"\n Content: {content}")
+                    for embed in embeds:
+                        file.write(f"{embed.get('description')}")
+        return True
 
 if __name__ == "__main__":
-    kn = KnowledgeDriver()
-    urls = kn.update_all_data()
+    discord_auth = ""
+    kn = KnowledgeDriver(discord_auth=discord_auth)
+    urls = kn._update_discord_faq()
     print(urls)

@@ -4,7 +4,12 @@ from web3 import Web3, HTTPProvider
 from app.core.config import config, redis_config, tg_conf
 from utils import knowledge_driver, telegram_bot
 
-redis_db = redis.Redis(host=redis_config.REDIS_HOST, port=redis_config.REDIS_PORT)
+redis_db = redis.Redis(
+    host=redis_config.REDIS_HOST,
+    port=redis_config.REDIS_PORT,
+    username=redis_config.REDIS_USER,
+    password=redis_config.REDIS_PASSWORD
+    )
 web3 = Web3(HTTPProvider(config.WEB3_PROVIDER))
 
 # -------- Initialize knowledge driver ----------------

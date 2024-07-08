@@ -135,7 +135,7 @@ def update_knowledge():
     try:
         update_vectorstore(url_list=new_urls)
     except Exception:
-        logging.exception(f"ERROR vectorstore creating!")
+        logger.exception(f"ERROR vectorstore creating!")
         tg_bot.send_message(message="Update vectorstore unsuccessful!")
     finally: tg_bot.send_message(message="Knowledge update finished!")
     tg_bot.send_message(message="Knowledge update finished!")

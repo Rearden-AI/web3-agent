@@ -23,7 +23,7 @@ from utils.extra import check_transactions_status
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(check_transactions_status, "cron", second='*/30')
+    # scheduler.add_job(check_transactions_status, "cron", second='*/30')
     scheduler.add_job(update_knowledge, "cron", hour='*/23')
     scheduler.start()
     redis_connection = redis.from_url(redis_config.REDIS_URL, encoding="utf8")

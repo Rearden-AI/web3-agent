@@ -1,0 +1,102 @@
+services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name:
+      redis
+    ports:
+      - "127.0.0.1:8001:8001"
+      - ${REDIS_PORT}:${REDIS_PORT}
+    expose:
+      - ${REDIS_PORT}
+    restart: always
+    volumes:
+      - /srv/redis:/data
+    networks:
+      - stage_rearden
+    hostname: redis
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PW}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    container_name:
+      rearden_postgres
+    expose:
+      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - stage_rearden
+    volumes:
+      - /srv/psql:/var/lib/postgresql/data
+    restart: always
+    hostname: postgres
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    expose:
+      - ${OLLAMA_PORT}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - stage_rearden
+    restart: always
+    hostname: ollama
+
+  chroma:
+    image: chromadb/chroma
+    container_name: chroma
+    expose:
+      - ${CHROMA_PORT}
+    ports:
+      - ${CHROMA_PORT}:${CHROMA_PORT}
+    networks:
+      - stage_rearden
+    volumes:
+      - ../chroma:/chroma/chroma
+    restart: always
+    hostname: chroma
+
+  dev-back:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    env_file:
+      - ../.envs/.stage
+    image:
+      back_stage
+    container_name:
+      stage-back
+    ports:
+      - "6013:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - stage_rearden
+    volumes:
+      - ../:/usr/src/app
+    restart: always
+    command: bash -c 'uvicorn main:app --proxy-headers --host 0.0.0.0'
+    depends_on:
+      - redis
+      - postgres
+      - ollama
+      - chroma
+    hostname: stage-back
+
+
+volumes:
+  rearden_db:
+
+networks:
+  dev_rearden: {}
+

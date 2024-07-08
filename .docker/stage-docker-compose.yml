@@ -98,5 +98,5 @@ volumes:
   rearden_db:
 
 networks:
-  dev_rearden: {}
-
+  stage_rearden: {}
+  

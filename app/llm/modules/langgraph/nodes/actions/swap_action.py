@@ -41,7 +41,7 @@ chain = (
     | JsonOutputParser()
 )
 
-def swap_action(state: ChatMessageFlowState):
+async def swap_action(state: ChatMessageFlowState):
     logger.info('Processing swap action')
 
     num_steps = int(state['num_steps'])
@@ -55,7 +55,7 @@ def swap_action(state: ChatMessageFlowState):
     tokens_list = '\n'.join(map(lambda x: f"{x.name} ({x.symbol})", tokens))
 
     try:
-        swap_params = chain.invoke({
+        swap_params = await chain.ainvoke({
             "tokens_list": tokens_list,
             "user_message": user_message
         })

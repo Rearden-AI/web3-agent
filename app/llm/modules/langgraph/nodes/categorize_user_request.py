@@ -52,14 +52,14 @@ user_message_category_generator = (
 )
 
 
-def categorize_user_request(state: ChatMessageFlowState):
+async def categorize_user_request(state: ChatMessageFlowState):
     logger.info('Categorizing message')
 
     user_message = state['user_message']
     num_steps = int(state['num_steps'])
     num_steps += 1
 
-    message_category = user_message_category_generator.invoke(user_message)
+    message_category = await user_message_category_generator.ainvoke(user_message)
     logger.info(message_category)
 
     return {'message_category': message_category, 'num_steps': num_steps}

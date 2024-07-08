@@ -74,7 +74,7 @@ workflow.add_conditional_edges(
 app = workflow.compile()
 
 
-def process_user_message_flow(
+async def process_user_message_flow(
         message: str,
         chain_id: int,
         address: str
@@ -85,4 +85,4 @@ def process_user_message_flow(
         address=address
     )
 
-    return app.invoke(input=initial_state)
+    return await app.ainvoke(input=initial_state)

@@ -75,14 +75,14 @@ user_action_category_generator = (
 )
 
 
-def categorize_user_action(state: ChatMessageFlowState):
+async def categorize_user_action(state: ChatMessageFlowState):
     logger.info('Catogorizing action')
 
     user_message = state['user_message']
     num_steps = int(state['num_steps'])
     num_steps += 1
 
-    action_category = user_action_category_generator.invoke(user_message)
+    action_category = await user_action_category_generator.ainvoke(user_message)
     logger.info(action_category)
 
     return {"action_category": action_category, 'num_steps': num_steps}

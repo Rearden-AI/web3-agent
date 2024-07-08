@@ -6,12 +6,12 @@ from .classes.llm_response import LlmResponse
 logger = logging.getLogger('llm')
 
 
-def process_user_message(
+async def process_user_message(
         message: str,
         chain_id: int,
         address: str
     ) -> LlmResponse:
-    flow_result = process_user_message_flow(
+    flow_result = await process_user_message_flow(
         message=message,
         chain_id=chain_id,
         address=address)

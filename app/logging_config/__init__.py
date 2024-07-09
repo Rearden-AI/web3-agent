@@ -3,6 +3,12 @@ import os
 import sys
 from datetime import datetime
 
+suppress_logs = [
+    "watchfiles.main",
+    "chromadb.config",
+    "urllib3.connectionpool"
+]
+
 
 def configure_logging():
     log_path = __get_log_path()
@@ -17,7 +23,8 @@ def configure_logging():
                                 filename=log_path
                             )
                         ])
-    logging.getLogger('watchfiles.main').setLevel(logging.WARNING)
+    for log in suppress_logs:
+        logging.getLogger(log).setLevel(logging.WARNING)
 
 
 def __get_log_path():

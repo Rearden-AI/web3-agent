@@ -61,7 +61,7 @@ def verify(
         signature: str = Body(),
         session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY)
 ):
-    logging.info("Got verify. Session id: %s", session_id)
+    logger.info("Got verify. Session id: %s", session_id)
     try:
         siwe_message = SiweMessage.from_message(message)
 

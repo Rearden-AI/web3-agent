@@ -10,7 +10,7 @@ from .constants import COOKIE_SESSION_ID_KEY
 
 
 async def extract_user_from_access_token(
-        session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY, default='ddd'),
+        session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY, default=None),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     sesion_info_str = redis_db.get(session_id)

@@ -100,9 +100,9 @@ async def transfer_action(state: ChatMessageFlowState):
     num_steps = int(state['num_steps'])
     num_steps += 1
 
-    transfer_params = await chain.ainvoke(user_message)
-
     try:
+        transfer_params = await chain.ainvoke(user_message)
+        
         action_data = get_transaction_data(
             chain_id=state["chain_id"],
             data={

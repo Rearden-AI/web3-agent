@@ -26,12 +26,22 @@ router = APIRouter(
 )
 async def get_nonce(
     response: Response,
-    request: Request
+    request: Request,
+    session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY, default=None),
 ):
     logger.info('Received /nonce')
     logger.debug("IP: %s", request.client.host)
     logger.debug("Platform: %s", request.headers.get("sec-ch-ua-platform"))
     logger.debug("Browser: %s", request.headers.get("sec-ch-ua"))
+
+    # do not generate new session id if current session id is valid
+    if session_id:
+        sesion_info_str = redis_db.get(session_id)
+        if sesion_info_str:
+            session_info = pickle.loads(sesion_info_str)
+            if session_info.get('siwe'):
+                return session_info.get("nonce")
+
     try:
         session_id = generate_session_id()
 

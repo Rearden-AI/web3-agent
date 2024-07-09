@@ -39,5 +39,5 @@ def __get_log_level():
     level = os.getenv('LOG_LEVEL')
     if not level or level == "INFO":
         return logging.INFO
-    
+
     return logging.DEBUG

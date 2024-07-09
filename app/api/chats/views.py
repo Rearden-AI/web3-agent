@@ -27,6 +27,8 @@ async def get_all_chats(
         pagination_query: PaginatedParams = Depends(),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
+    logger.info("Received get all chats request")
+
     res = await crud.get_all(
         session=session,
         pagination_query=pagination_query,
@@ -44,6 +46,7 @@ async def get_all_chats(
 async def create_new_chat(
         chat: ChatSchema = Depends(dependencies.start_new_chat),
 ):
+    logger.info("Received create new chat request")
     return chat
 
 
@@ -55,6 +58,7 @@ async def create_new_chat(
 async def get_selected_chat(
     chat: ExtendedChatSchema = Depends(dependencies.get_extended_chat_by_uuid),
 ):
+    logger.info("Received get chat %s request", chat.uuid)
     return chat
 
 
@@ -66,6 +70,7 @@ async def get_selected_chat(
 async def start_chat_streaming(
         chat: ChatSchema = Depends(dependencies.process_chat_request),
 ):
+    logger.info("Received message from chat %s", chat.uuid)
     return chat
 
 
@@ -89,6 +94,7 @@ async def delete_selected_chat(
     chat: Chat = Depends(dependencies.get_chat_by_uuid),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
+    logger.info("Received deelete chat %s request", chat.uuid)
     await crud.delete_chat(session, chat)
 
 
@@ -98,6 +104,7 @@ async def patch_selected_chat(
     chat: Chat = Depends(dependencies.get_chat_by_uuid),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
+    logger.info("Received update chat %s request", chat.uuid)
     return await crud.update_chat(
         session=session,
         chat=chat,

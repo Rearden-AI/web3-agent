@@ -5,6 +5,22 @@ from datetime import datetime
 
 
 def configure_logging():
+    log_path = __get_log_path()
+    log_level = __get_log_level()
+
+    logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s]: %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=log_level,
+                        handlers=[
+                            logging.StreamHandler(stream=sys.stdout),
+                            logging.FileHandler(
+                                filename=log_path
+                            )
+                        ])
+    logging.getLogger('watchfiles.main').setLevel(logging.WARNING)
+
+
+def __get_log_path():
     env = os.getenv('ENV')
 
     if not os.path.exists('log'):
@@ -16,14 +32,12 @@ def configure_logging():
     log_time = '{:%Y-%m-%d_%H:%M:%S}'.format(datetime.now())
     log_path = f'log/{env}/{log_time}.log'
 
-    logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s]: %(message)s',
-                        datefmt='%H:%M:%S',
-                        level=logging.INFO,
-                        handlers=[
-                            logging.StreamHandler(stream=sys.stdout),
-                            logging.FileHandler(
-                                filename=log_path
-                            )
-                        ])
-    logging.getLogger('watchfiles.main').setLevel(logging.WARNING)
+    return log_path
+
+
+def __get_log_level():
+    level = os.getenv('LOG_LEVEL')
+    if not level or level == "INFO":
+        return logging.INFO
     
+    return logging.DEBUG

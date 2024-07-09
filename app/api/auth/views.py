@@ -43,6 +43,8 @@ async def get_nonce(
             samesite='none',
             secure=True)
 
+        logging.debug("Return nonce %s", nonce)
+
         return nonce
     except Exception as e:
         logger.error(e)
@@ -59,6 +61,7 @@ def verify(
         signature: str = Body(),
         session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY)
 ):
+    logging.info("Got verify. Session id: %s", session_id)
     try:
         siwe_message = SiweMessage.from_message(message)
 
@@ -72,9 +75,11 @@ def verify(
         redis_db.set(session_id, pickle.dumps(session_info))
         # COOKIES[session_id]['expires'] = int(time.time())
 
+        logger.debug("Verified successfully. Session id: %s", session_id)
+
         return True
-    except Exception as e:
-        print(e)
+    except:
+        logger.exception("Failed to verify. Session id: %s", session_id)
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -103,14 +108,18 @@ def verify(
 async def logout(
     session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY)
 ):
+    logger.info("Received logout. Session id: %s", session_id)
     try:
         redis_db.delete(session_id)
-    except:
-        pass
+
+        logger.debug("Successfully logged out. Session id: %s", session_id)
+    except Exception:
+        logger.exception("Failed to logout. Session id: %s", session_id)
 
 
 @router.get("/me")
 async def me(
     user: User = Depends(dependencies.extract_user_from_access_token),
 ):
+    logger.info("Gout /me. Wallet %s", user.wallet)
     return user.wallet

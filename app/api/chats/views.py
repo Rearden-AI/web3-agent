@@ -68,9 +68,10 @@ async def get_selected_chat(
     status_code=status.HTTP_200_OK,
 )
 async def start_chat_streaming(
+        chat_uuid: str,
         chat: ChatSchema = Depends(dependencies.process_chat_request),
 ):
-    logger.info("Received message from chat %s", chat.uuid)
+    logger.info("Received message from chat %s", chat_uuid)
     return chat
 
 

@@ -1,7 +1,7 @@
 # pylint: disable=raise-missing-from
 import pickle
 import logging
-from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status, Depends
+from fastapi import APIRouter, Body, Cookie, HTTPException, Response, status, Depends, Request
 from fastapi.responses import PlainTextResponse
 from siwe import generate_nonce, SiweMessage
 
@@ -25,9 +25,13 @@ router = APIRouter(
         response_class=PlainTextResponse
 )
 async def get_nonce(
-    response: Response
+    response: Response,
+    request: Request
 ):
     logger.info('Received /nonce')
+    logger.debug("IP: %s", request.client.host)
+    logger.debug("Platform: %s", request.headers.get("sec-ch-ua-platform"))
+    logger.debug("Browser: %s", request.headers.get("sec-ch-ua"))
     try:
         session_id = generate_session_id()
 
@@ -43,7 +47,7 @@ async def get_nonce(
             samesite='none',
             secure=True)
 
-        logging.debug("Return nonce %s", nonce)
+        logger.debug("Return nonce %s. Session id: %s", nonce, session_id)
 
         return nonce
     except Exception as e:

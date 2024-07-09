@@ -6,7 +6,13 @@ from datetime import datetime
 suppress_logs = [
     "watchfiles.main",
     "chromadb.config",
-    "urllib3.connectionpool"
+    "urllib3.connectionpool",
+    "selenium.webdriver.remote.remote_connection",
+    "selenium.webdriver.common.driver_finder",
+    "selenium.webdriver.common.service",
+    "chromadb.telemetry.product.posthog",
+    "rlp.codec",
+    "tzlocal"
 ]
 
 

@@ -13,6 +13,12 @@ async def extract_user_from_access_token(
         session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY, default=None),
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
+    if not session_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You have to first sign_in",
+        )
+
     sesion_info_str = redis_db.get(session_id)
     if not sesion_info_str:
         raise HTTPException(

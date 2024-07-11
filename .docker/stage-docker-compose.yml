@@ -79,7 +79,7 @@ services:
     container_name:
       back_stage
     ports:
-      - "${API_PORT}:8000"
+      - "6013:8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

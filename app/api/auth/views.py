@@ -55,7 +55,8 @@ async def get_nonce(
             key=COOKIE_SESSION_ID_KEY,
             value=session_id,
             samesite='none',
-            secure=True)
+            secure=True,
+            domain=".rearden.xyz")
 
         logger.debug("Return nonce %s. Session id: %s", nonce, session_id)
 

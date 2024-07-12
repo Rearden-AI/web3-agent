@@ -113,3 +113,4 @@ jsonpickle==3.2.1
 siwe==4.1.0
 psutil
 unstructured
+discord.py==2.4.0

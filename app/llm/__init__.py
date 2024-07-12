@@ -1,6 +1,6 @@
 import logging
 
-from app.llm.modules.langgraph import process_user_message_flow
+from app.llm.modules.langgraph import process_user_message_flow, process_discord_message_flow
 from .classes.llm_response import LlmResponse
 
 logger = logging.getLogger('llm')
@@ -25,3 +25,12 @@ async def process_user_message(
     )
 
     return response
+
+
+async def process_project_question(
+        message: str,
+        project: str
+):
+    flow_result = await process_discord_message_flow(message, project)
+    return flow_result['response']
+    

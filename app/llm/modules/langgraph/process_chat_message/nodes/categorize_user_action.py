@@ -5,10 +5,11 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
 from app.llm.utils import get_few_shot_template, get_prefix_template, get_suffix_template 
+from app.llm.modules.llm import get_model
 
 from ..classes.chat_message_flow_state import ChatMessageFlowState
 from ..constants import glossary, supported_actions
-from ...llm import get_model
+# from ...llm import get_model
 
 logger = logging.getLogger('categorize_user_action')
 

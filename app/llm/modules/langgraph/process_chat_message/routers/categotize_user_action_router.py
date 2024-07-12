@@ -1,4 +1,4 @@
-from app.llm.modules.langgraph.classes.chat_message_flow_state import ChatMessageFlowState
+from ..classes import ChatMessageFlowState
 
 
 def categotize_user_action_router(state: ChatMessageFlowState):

@@ -15,7 +15,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.core.modules_factory import redis_db, tg_bot, kd
 from app.core.config import chroma_settings
 from ..classes.chat_message_flow_state import ChatMessageFlowState
-from ...llm import get_model
+from app.llm.modules.llm import get_model
 
 logger = logging.getLogger('answer_based_on_documentation')
 
@@ -143,6 +143,6 @@ def update_knowledge():
     return True
 
 
-# logger.info('Updating knowledgebase')
-# update_knowledge()
-# logger.info('Finished updating')
+logger.info('Updating knowledgebase')
+update_knowledge()
+logger.info('Finished updating')

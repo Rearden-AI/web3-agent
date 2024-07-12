@@ -14,8 +14,10 @@ from app.core.models import db_helper, Base
 
 from app.api import router as router_v1
 from app.core.config import config, redis_config
-from app.llm.modules.langgraph.nodes.answer_based_on_documentation import update_knowledge
+from app.llm.modules.langgraph.process_chat_message.nodes.answer_based_on_documentation import update_knowledge
 from utils.extra import check_transactions_status
+
+from .discord import rearden_discord_client
 
 
 # from fastapi_pagination import add_pagination
@@ -52,5 +54,7 @@ app.add_middleware(
 
 
 app.include_router(router=router_v1, prefix=config.api_v1_prefix)
+
+rearden_discord_client.run("TOKEN")
 
 # add_pagination(app)

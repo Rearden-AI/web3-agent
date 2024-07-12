@@ -4,11 +4,11 @@ from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-from app.llm.utils import get_template 
+from app.llm.utils import get_template
+from app.llm.modules.llm import get_model
 
 from ..classes.chat_message_flow_state import ChatMessageFlowState
 from ..constants import user_request_categories, glossary, supported_actions
-from ...llm import get_model
 
 logger = logging.getLogger('categorize_user_request')
 

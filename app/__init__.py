@@ -1,9 +1,14 @@
 # pylint: disable=wrong-import-position
+import logging
+
 from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse, PlainTextResponse
 import redis.asyncio as redis
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_limiter import FastAPILimiter
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.logging_config import configure_logging
@@ -15,7 +20,11 @@ from app.core.models import db_helper, Base
 from app.api import router as router_v1
 from app.core.config import config, redis_config
 from app.llm.modules.langgraph.nodes.answer_based_on_documentation import update_knowledge
+from app import telegram
+
 from utils.extra import check_transactions_status
+
+logger = logging.getLogger("app")
 
 
 # from fastapi_pagination import add_pagination
@@ -52,5 +61,55 @@ app.add_middleware(
 
 
 app.include_router(router=router_v1, prefix=config.api_v1_prefix)
+
+@app.exception_handler(HTTPException)
+async def exception_handler(request: Request, exc: HTTPException):
+    msg = (await format_request(request)) + "\n\n" + str(exc)
+
+    await telegram.notify_error(msg)
+    return await http_exception_handler(request, exc)
+
+
+async def set_body(request: Request, body: bytes):
+    async def receive():
+        return {"type": "http.request", "body": body}
+
+    request._receive = receive
+
+
+async def get_body(request: Request) -> bytes:
+    body = await request.body()
+    await set_body(request, body)
+    return body
+
+
+@app.middleware("http")
+async def errors_handling(request: Request, call_next):
+    body = await request.body()
+    try:
+        await set_body(request, body)
+        return await call_next(request)
+    except Exception as exc:
+        msg = f"URL: {request.url}\n"
+        msg += f"Body: {body.decode()}"
+        msg += "\n\n"
+        msg += str(exc)
+
+        await telegram.notify_error(msg)
+
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=str(exc)
+        )
+
+
+
+async def format_request(request: Request):
+    msg = f"URL: {request.url}\n"
+
+    body = await request.body()
+    msg += f"Body: {body.decode()}"
+
+    return msg
 
 # add_pagination(app)

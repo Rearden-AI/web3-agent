@@ -17,14 +17,20 @@ logger = logging.getLogger("Knowledge driver")
 class KnowledgeDriver:
     def __init__(self, discord_auth: str):
         self.driver = self._create_driver()
-        self.urls_for_knowledge = ["https://docs.neonevm.org/docs/quick_start",
-                                   "https://docs.starknet.io",
-                                   "https://docs.wormhole.com/wormhole",
-                                   "https://docs.sui.io"
-                                   ]
-        self.blog_urls = ["https://wormhole.com/blog",
-                          "https://neonevm.org/blog"
-                          ]
+        self.urls_for_knowledge = [
+            "https://docs.neonevm.org/docs/quick_start",
+            "https://docs.starknet.io",
+            "https://docs.wormhole.com/wormhole",
+            "https://docs.sui.io",
+            {
+                "url": "https://portalbridge.com/docs",
+                "starts_with": "https://portalbridge.com/docs/"
+            }
+        ]
+        self.blog_urls = [
+            "https://wormhole.com/blog",
+            "https://neonevm.org/blog"
+        ]
         self.discord_auth = discord_auth
         self.discord_urls = [{"name": "wormhole",
                               "url": "https://discord.com/api/v9/channels/1075310129798459492/threads/search?archived=true&sort_by=last_message_time&sort_order=desc&limit=25&tag_setting=match_some&offset=0"},
@@ -51,7 +57,7 @@ class KnowledgeDriver:
     def update_all_data(self):
         urls = self._update_all_urls()
         blog_posts = self._update_blog_posts()
-        is_faq_updated = self._update_discord_faq()
+        is_faq_updated = False # self._update_discord_faq()
         self.driver.close()
         return urls.union(blog_posts), is_faq_updated
 
@@ -65,12 +71,20 @@ class KnowledgeDriver:
             self.driver = self._create_driver()
         urls_over_protocol = set()
 
-        def __crawl_page(url):
+        def __crawl_page(page):
             # logger.info(f"Crawling {url}")
+            if type(page) is str:
+                url = page
+
+                splited_url = url.split("/")
+                base_url = f"{splited_url[0]}//{splited_url[2]}"
+            else:
+                url = page["url"]
+                base_url = page["starts_with"]
+
+
             urls_over_protocol.add(url)
 
-            splited_url = url.split("/")
-            base_url = f"{splited_url[0]}//{splited_url[2]}"
             try:
                 self.driver.get(url)
 
@@ -90,7 +104,7 @@ class KnowledgeDriver:
                     if link.endswith('/'):
                         link = link[:-1]
                     if link.startswith(base_url) and link not in urls_over_protocol and not link.endswith('.pdf'):
-                        __crawl_page(url=link)
+                        __crawl_page(page=link)
             except TimeoutException:
                 pass
             except:

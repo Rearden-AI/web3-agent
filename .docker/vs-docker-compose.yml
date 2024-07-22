@@ -1,0 +1,28 @@
+  vs-updater:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    env_file:
+      - ../.envs/.dev
+    image:
+      vs-updater
+    container_name:
+      vs-updater
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - dev_rearden
+    volumes:
+      - ../:/usr/src/app
+    restart: always
+    command: bash -c 'uvicorn main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
+    depends_on:
+      - redis
+    hostname: vs-updater
+
+
+volumes:
+  rearden_db:
+
+networks:
+  dev_rearden: {}

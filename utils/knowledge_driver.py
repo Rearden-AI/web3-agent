@@ -165,5 +165,5 @@ class KnowledgeDriver:
 if __name__ == "__main__":
     discord_auth = ""
     kn = KnowledgeDriver(discord_auth=discord_auth)
-    urls = kn._update_discord_faq()
+    urls = kn.update_all_data()
     print(urls)

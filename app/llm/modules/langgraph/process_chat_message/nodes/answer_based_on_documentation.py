@@ -1,6 +1,8 @@
 import logging
 import os
 
+from operator import itemgetter
+
 import chromadb
 
 from langchain_core.output_parsers import StrOutputParser
@@ -12,7 +14,7 @@ from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoade
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from app.core.modules_factory import redis_db, tg_bot, kd
+from app.core.modules_factory import tg_bot, kd
 from app.core.config import chroma_settings
 from ..classes.chat_message_flow_state import ChatMessageFlowState
 from app.llm.modules.llm import get_model
@@ -118,28 +120,29 @@ def update_knowledge():
     tg_bot.send_message(message="Knowledge update started!")
     logger.info('Start kd update all date')
     urls, is_faq_updated = kd.update_all_data()
+    logger.debug("%d urls found", len(urls))
     if not is_faq_updated:
         tg_bot.send_message(message="Can't update FAQ. Auth token expired!")
     logger.debug('Finish kd update all data')
-    existing_urls = redis_db.lrange("knowledge_url", 0, -1)
-    decoded_urls = [url.decode('utf-8') for url in existing_urls]
-    new_urls = [url for url in urls if url not in decoded_urls]
-    logger.info(f"NEW URLS: {new_urls}")
+
+    urls_in_vectorstore = list(map(itemgetter('source'), vector_store.get()['metadatas']))
+
+    new_urls = [url for url in urls if url not in urls_in_vectorstore]
+    logger.debug("%d new urls", len(new_urls))
     if not new_urls:
         return
     url_str = "\n".join(new_urls)
     message = f"There are new urls added: {url_str}!"
-    result = tg_bot.send_message(message=message)
-    logger.info(f"Result of knowledge update send message: {result}")
-    for value in new_urls:
-        redis_db.rpush("knowledge_url", value)
+    tg_bot.send_message(message=message)
+
     try:
         update_vectorstore(url_list=new_urls)
     except Exception:
-        logger.exception(f"ERROR vectorstore creating!")
+        logger.exception("ERROR vectorstore creating!")
         tg_bot.send_message(message="Update vectorstore unsuccessful!")
-    finally: tg_bot.send_message(message="Knowledge update finished!")
-    tg_bot.send_message(message="Knowledge update finished!")
+    finally:
+        tg_bot.send_message(message="Knowledge update finished!")
+
     return True
 
 

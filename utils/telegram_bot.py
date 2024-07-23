@@ -8,5 +8,8 @@ class TelegramBot:
 
     def send_message(self, message: str) -> dict:
         data = {'chat_id': self.chat, 'text': message, 'parse_mode': 'Markdown'}
-        result = requests.post(url=f"{self.url}/sendMessage", headers={'Content-Type': 'application/json'}, params=data)
-        return {"ok": True} if result.status_code == 200 else {"ok": False}
+        requests.post(
+            url=f"{self.url}/sendMessage",
+            headers={'Content-Type': 'application/json'},
+            params=data,
+            timeout=120)

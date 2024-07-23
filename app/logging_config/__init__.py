@@ -12,7 +12,12 @@ suppress_logs = [
     "selenium.webdriver.common.service",
     "chromadb.telemetry.product.posthog",
     "rlp.codec",
-    "tzlocal"
+    "tzlocal",
+    "unstructured.trace",
+    "httpcore.http11",
+    "httpcore.connection",
+    "telegram.Bot",
+    "httpx"
 ]
 
 

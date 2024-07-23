@@ -17,8 +17,6 @@ services:
       - ../:/usr/src/app
     restart: always
     command: bash -c 'uvicorn main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
-    depends_on:
-      - redis
     hostname: vs-updater
 
 

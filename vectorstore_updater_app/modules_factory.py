@@ -1,6 +1,6 @@
 import redis
 
-from app.core.config import config, redis_config, tg_conf
+from .config import config, redis_config, tg_conf
 from utils import knowledge_driver, telegram_bot
 
 redis_db = redis.Redis(

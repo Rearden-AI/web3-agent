@@ -10,7 +10,7 @@ from langchain_community.document_transformers import Html2TextTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from .modules_factory import redis_db, tg_bot, kd
-from app.core.config import chroma_settings
+from .config import chroma_settings
 
 logger = logging.getLogger('vs_update')
 

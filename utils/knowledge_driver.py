@@ -145,7 +145,7 @@ class KnowledgeDriver:
             if isinstance(data, dict) and data.get("message") == '401: Unauthorized':
                 return False
             protocol_name = protocol.get('name')
-            path = os.path.join(f"{protocol_name}_discord.txt")
+            path = os.path.join("vectorstore_updater_app", "knowledge", f"{protocol_name}_discord.txt")
             with open(path, "w") as file:
                 file.write(f"Protocol: {protocol_name}")
                 if protocol_name in ('wormhole'):
@@ -163,7 +163,12 @@ class KnowledgeDriver:
         return True
 
 if __name__ == "__main__":
+    import time
     discord_auth = ""
     kn = KnowledgeDriver(discord_auth=discord_auth)
-    urls = kn.update_all_data()
+    start = time.time()
+    urls, is_disco_updated = kn.update_all_data()
+    end = time.time()
+    print("the time of execution: ", (end - start))
     print(urls)
+    print(f"url length {len(urls)}")

@@ -32,7 +32,7 @@ def update_vectorstore(url_list: list):
     logger.info(f"Updating vectorstore with {len(url_list)} links")
 
     docs = AsyncHtmlLoader(web_path=url_list).load()
-    knowledge_dir_path = os.path.realpath(os.path.join('app', "llm", "modules", "knowledge"))
+    knowledge_dir_path = os.path.realpath(os.path.join("vectorstore_updater_app", "knowledge"))
     txt_docs = DirectoryLoader(path=knowledge_dir_path).load()
 
     html2text = Html2TextTransformer()

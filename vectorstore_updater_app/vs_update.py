@@ -59,7 +59,7 @@ def update_knowledge():
     new_urls = [url for url in urls if url not in decoded_urls]
     logger.info(f"NEW URLS: {new_urls}")
     if not new_urls:
-        return
+        tg_bot.send_message(message="Knowledge update finished!")
     url_str = "\n".join(new_urls)
     message = f"There are new urls added: {url_str}!"
     result = tg_bot.send_message(message=message)

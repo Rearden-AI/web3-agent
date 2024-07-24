@@ -58,20 +58,20 @@ def update_knowledge():
     decoded_urls = [url.decode('utf-8') for url in existing_urls]
     new_urls = [url for url in urls if url not in decoded_urls]
     logger.info(f"NEW URLS: {new_urls}")
-    if not new_urls:
-        tg_bot.send_message(message="Knowledge update finished!")
-    url_str = "\n".join(new_urls)
-    message = f"There are new urls added: {url_str}!"
-    result = tg_bot.send_message(message=message)
-    logger.info(f"Result of knowledge update send message: {result}")
-    for value in new_urls:
-        redis_db.rpush("knowledge_url", value)
-    try:
-        update_vectorstore(url_list=new_urls)
-    except Exception:
-        logger.exception(f"ERROR vectorstore creating!")
-        tg_bot.send_message(message="Update vectorstore unsuccessful!")
-    finally:
-        tg_bot.send_message(message="Knowledge update finished!")
-    tg_bot.send_message(message="Knowledge update finished!")
+    if new_urls:
+        url_str = "\n".join(new_urls)
+        message = f"There are new urls added: {url_str}!"
+        result = tg_bot.send_message(message=message)
+        logger.info(f"Result of knowledge update send message: {result}")
+        for value in new_urls:
+            redis_db.rpush("knowledge_url", value)
+        try:
+            update_vectorstore(url_list=new_urls)
+        except Exception:
+            logger.exception(f"ERROR vectorstore creating!")
+            tg_bot.send_message(message="Update vectorstore unsuccessful!")
+        finally:
+            tg_bot.send_message(message="Knowledge update finished!")
+    else:
+        tg_bot.send_message(message="No urls to add")
     return True

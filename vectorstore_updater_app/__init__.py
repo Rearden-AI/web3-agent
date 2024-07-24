@@ -9,7 +9,7 @@ configure_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(update_knowledge, "cron", minute='*/30')
+    scheduler.add_job(update_knowledge, "cron", hour='0', minute='0')
     scheduler.start()
 
     yield

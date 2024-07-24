@@ -8,11 +8,11 @@ redis_db = redis.Redis(
     host=redis_config.REDIS_HOST,
     port=redis_config.REDIS_PORT,
     username=redis_config.REDIS_USER,
-    password=redis_config.REDIS_PASSWORD
-    )
+    password=redis_config.REDIS_PASSWORD,
+)
 web3 = Web3(HTTPProvider(config.WEB3_PROVIDER))
 
 # -------- Initialize knowledge driver ----------------
-kd = knowledge_driver.KnowledgeDriver(discord_auth=config.DISCORD_AUTH)
+kd = knowledge_driver.KnowledgeDriver()
 # -------- Initialize Telegram Bot --------------------
 tg_bot = telegram_bot.TelegramBot(token=tg_conf.TG_TOKEN, chat=tg_conf.TG_CHAT_ID)

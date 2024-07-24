@@ -18,15 +18,17 @@ class RedisSettings(BaseSettings):
     REDIS_PORT: str = ""
     REDIS_USER: str = ""
     REDIS_PASSWORD: str = ""
-    REDIS_URL: str = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+    REDIS_URL: str = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
 
 class TelegramSettings(BaseSettings):
     TG_TOKEN: str = ""
     TG_CHAT_ID: str = ""
 
+
 class OLLAMASettings(BaseSettings):
     OLLAMA_URL: str = "http://localhost:11434"
+
 
 class DBSettings(BaseSettings):
     DB_NAME: str = ""
@@ -35,12 +37,10 @@ class DBSettings(BaseSettings):
     DB_PORT: str = "5432"
     DB_PW: str = ""
 
-    SQLALCHEMY_DATABASE_URL: str = f'postgresql+asyncpg://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    SQLALCHEMY_DATABASE_URL: str = (
+        f"postgresql+asyncpg://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
     db_echo: bool = False
-
-class ChromaSettings(BaseSettings):
-    CHROMA_HOST: str = "localhost"
-    CHROMA_PORT: int = 8000
 
 
 class SuperadminSettings(BaseSettings):
@@ -52,5 +52,4 @@ tg_conf = TelegramSettings()
 db_config = DBSettings()
 redis_config = RedisSettings()
 ollama_config = OLLAMASettings()
-chroma_settings = ChromaSettings()
 superadmin_settings = SuperadminSettings()

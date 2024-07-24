@@ -1,2 +1,2 @@
-from .process_chat_message import process_user_message_flow
-from .process_discord_message import process_discord_message_flow
+from .flows.process_chat_message import process_user_message_flow
+from .flows.process_discord_message import process_discord_message_flow

@@ -4,19 +4,13 @@ import traceback
 
 
 from contextlib import asynccontextmanager
-from fastapi.responses import JSONResponse, PlainTextResponse
 import redis.asyncio as redis
-from fastapi import FastAPI, HTTPException, Request, status, Response
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exception_handlers import http_exception_handler
 from fastapi_limiter import FastAPILimiter
-from fastapi.exception_handlers import (
-    http_exception_handler,
-    request_validation_exception_handler,
-)
-from fastapi.exceptions import RequestValidationError
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi.routing import APIRoute
-from typing import Callable, List, Union
 
 
 from app.logging_config import configure_logging
@@ -24,19 +18,17 @@ from app.logging_config import configure_logging
 configure_logging()
 
 # this is needed for alempic migrations
+from app import telegram
 from app.core.models import db_helper, Base
 
 from app.api import router as router_v1
 from app.core.config import config, redis_config
-from app.llm.modules.langgraph.process_chat_message.nodes.answer_based_on_documentation import (
+from app.llm.modules.langgraph.common_chains.documentation_rag.vectorstore_updater import (
     update_knowledge,
 )
-from utils.extra import check_transactions_status
 
-from .discord import rearden_discord_client
-from app import telegram
+from .discord import run_discord_bot
 
-from utils.extra import check_transactions_status
 
 logger = logging.getLogger("app")
 
@@ -74,8 +66,6 @@ app.add_middleware(
 
 app.include_router(router=router_v1, prefix=config.api_v1_prefix)
 
-rearden_discord_client.run("TOKEN")
-
 
 @app.exception_handler(HTTPException)
 async def exception_handler(request: Request, exc: HTTPException):
@@ -108,5 +98,7 @@ async def format_request(request: Request):
 
     return msg
 
+
+run_discord_bot()
 
 # add_pagination(app)

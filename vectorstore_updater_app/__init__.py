@@ -7,7 +7,7 @@ from .vs_update import update_knowledge
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(update_knowledge, "cron", minute='*/20')
+    scheduler.add_job(update_knowledge, "interval", minutes=20)
     scheduler.start()
 
     yield

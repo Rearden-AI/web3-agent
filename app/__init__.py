@@ -1,6 +1,7 @@
 # pylint: disable=wrong-import-position
 import logging
 import traceback
+import asyncio
 
 
 from contextlib import asynccontextmanager
@@ -43,6 +44,8 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(update_knowledge, "cron", hour="*/23")
     scheduler.start()
     redis_connection = redis.from_url(redis_config.REDIS_URL, encoding="utf8")
+
+    asyncio.create_task(run_discord_bot())
 
     print("Started lifespan")
     await FastAPILimiter.init(redis_connection)
@@ -98,7 +101,5 @@ async def format_request(request: Request):
 
     return msg
 
-
-run_discord_bot()
 
 # add_pagination(app)

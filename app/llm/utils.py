@@ -1,4 +1,3 @@
-from app.llm.modules.langgraph.classes.chat_message_flow_state import ChatMessageFlowState
 from .llama_3_constants import *
 
 default_user_message_template = """
@@ -26,18 +25,3 @@ def get_template(system_message: str, user_message: str=default_user_message_tem
 
 def get_template_for_few_shot(system_message: str, user_message: str, assistant_message: str):
     return f"{get_template(system_message=system_message, user_message=user_message)}{assistant_message}"
-
-
-def get_initial_state(
-    message: str,
-    chain_id: int,
-    address: str  
-) -> ChatMessageFlowState:
-    return ChatMessageFlowState(
-        user_address=address,
-        user_message=message,
-        chain_id=chain_id,
-        num_steps=0,
-        actions=[],
-        chooseable_actions=[]
-    )

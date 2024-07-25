@@ -52,13 +52,14 @@ def update_knowledge():
     logger.info('Start kd update all date')
     urls, is_faq_updated = kd.update_all_data()
     if not is_faq_updated:
+        logger.info("Can't update FAQ.")
         tg_bot.send_message(message="Can't update FAQ. Auth token expired!")
     logger.debug('Finish kd update all data')
     existing_urls = redis_db.lrange("knowledge_url", 0, -1)
     decoded_urls = [url.decode('utf-8') for url in existing_urls]
     new_urls = [url for url in urls if url not in decoded_urls]
     logger.info(f"NEW URLS: {new_urls}")
-    if new_urls:
+    if new_urls or is_faq_updated:
         url_str = "\n".join(new_urls)
         message = f"There are new urls added: {url_str}!"
         result = tg_bot.send_message(message=message)

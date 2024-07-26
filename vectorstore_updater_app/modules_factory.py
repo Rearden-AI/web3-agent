@@ -1,3 +1,5 @@
+import logging
+
 import redis
 
 from .config import config, redis_config, tg_conf
@@ -13,5 +15,6 @@ redis_db = redis.Redis(
 
 # -------- Initialize knowledge driver ----------------
 kd = knowledge_driver.KnowledgeDriver(discord_auth=config.DISCORD_AUTH)
+logging.info(f"disco token:{config.DISCORD_AUTH}")
 # -------- Initialize Telegram Bot --------------------
 tg_bot = telegram_bot.TelegramBot(token=tg_conf.TG_TOKEN, chat=tg_conf.TG_CHAT_ID)

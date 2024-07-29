@@ -12,16 +12,29 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - dev_rearden
+      - vectorstore
     volumes:
       - ../:/usr/src/app
     restart: always
     command: bash -c 'uvicorn vs_main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
     hostname: vs-updater
 
+  chroma:
+    image: chromadb/chroma
+    container_name: chroma
+    expose:
+      - ${CHROMA_PORT}
+    ports:
+      - ${CHROMA_PORT}:${CHROMA_PORT}
+    networks:
+      - vectorstore
+    volumes:
+      - ../chroma:/chroma/chroma
+    restart: always
+    hostname: chroma
 
 volumes:
   rearden_db:
 
 networks:
-  dev_rearden: { }
+  vectorstore: { }

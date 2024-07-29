@@ -14,7 +14,7 @@ services:
     volumes:
       - /srv/redis:/data
     networks:
-      - dev_rearden
+      - prod_rearden
     hostname: redis
 
   postgres:
@@ -31,7 +31,7 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     networks:
-      - dev_rearden
+      - prod_rearden
     volumes:
       - /srv/psql:/var/lib/postgresql/data
     restart: always
@@ -50,40 +50,26 @@ services:
               count: all
               capabilities: [gpu]
     networks:
-      - dev_rearden
+      - prod_rearden
     restart: always
     hostname: ollama
 
-  chroma:
-    image: chromadb/chroma
-    container_name: chroma
-    expose:
-      - ${CHROMA_PORT}
-    ports:
-      - ${CHROMA_PORT}:${CHROMA_PORT}
-    networks:
-      - dev_rearden
-    volumes:
-      - ../chroma:/chroma/chroma
-    restart: always
-    hostname: chroma
-
-  dev-back:
+  prod-back:
     build:
       context: ../
       dockerfile: Dockerfile
     env_file:
-      - ../.envs/.dev
+      - ../.envs/.prod
     image:
-      back_dev
+      back_prod
     container_name:
-      dev-back
+      prod-back
     ports:
       - "6015:8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - dev_rearden
+      - prod_rearden
     volumes:
       - ../:/usr/src/app
     restart: always
@@ -92,12 +78,12 @@ services:
       - redis
       - postgres
       - ollama
-    hostname: dev-back
+    hostname: prod-back
 
 
 volumes:
   rearden_db:
 
 networks:
-  dev_rearden: {}
+  prod_rearden: {}
   

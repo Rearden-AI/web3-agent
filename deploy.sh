@@ -34,6 +34,7 @@ fi
 
 # Run docker compose
 docker compose -f .docker/${ENV}-docker-compose.yml --env-file=.envs/.${ENV} up -d --build
+docker compose -f .docker/prerequisites-docker-compose.yaml --env-file=.envs/.${ENV} up -d --build
 
 # If migration flag is true, run test.sh
 if [ "$MIGRATION_FLAG" = true ]; then

@@ -1,17 +1,11 @@
-FROM python:3.11.0
+FROM python:3.11
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y chromium-driver
-
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/root/.local/bin:$PATH"
-
+RUN pip install --upgrade pip
 WORKDIR /usr/src/vectorstore_updater_app
 
-COPY pyproject.toml pyproject.toml
-COPY poetry.lock poetry.lock
+COPY requirements.txt requirements.txt
 
-RUN poetry install
+RUN pip install --no-cache-dir --force-reinstall -r requirements.txt
 
 COPY . /usr/src/vectorstore_updater_app/
-
-ENTRYPOINT ["poetry", "run", "python", "-m", "vs_main.py"]

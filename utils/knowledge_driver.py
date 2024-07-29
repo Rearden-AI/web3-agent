@@ -36,22 +36,32 @@ class KnowledgeDriver:
             print(f"Driver not started: {e}")
             return False
 
-    def parse_all_links(self, initial_page):
+    def parse_all_links(self, initial_page: str | dict):
         if not self.is_driver_started():
             self.driver = self._create_driver()
+
         urls_over_protocol = set()
 
-        def __crawl_page(url):
+        def __crawl_page(page: str | dict):
             # logger.info(f"Crawling {url}")
+            if isinstance(page, str):
+                url = page
+
+                splited_url = url.split("/")
+                base_url = f"{splited_url[0]}//{splited_url[2]}"
+            else:
+                url = page["url"]
+                base_url = page["starts_with"]
+
             urls_over_protocol.add(url)
 
-            splited_url = url.split("/")
-            base_url = f"{splited_url[0]}//{splited_url[2]}"
             try:
                 self.driver.get(url)
 
-                links = WebDriverWait(self.driver, 10) \
-                    .until(EC.presence_of_all_elements_located((By.TAG_NAME, "A")))
+                links = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_all_elements_located((By.TAG_NAME, "A"))
+                )
+
                 def __get_href(element):
                     try:
                         return element.get_attribute("href")
@@ -63,16 +73,20 @@ class KnowledgeDriver:
 
                 for link in links:
                     link = link.split("#")[0]
-                    if link.endswith('/'):
+                    if link.endswith("/"):
                         link = link[:-1]
-                    if link.startswith(base_url) and link not in urls_over_protocol and not link.endswith('.pdf'):
-                        __crawl_page(url=link)
+                    if (
+                        link.startswith(base_url)
+                        and link not in urls_over_protocol
+                        and not link.endswith(".pdf")
+                    ):
+                        __crawl_page(page={"url": link, "starts_with": base_url})
             except TimeoutException:
                 pass
-            except:
-                    logger.exception("Failed to crawl")
+            except Exception:
+                logger.exception("Failed to crawl")
 
-        __crawl_page(initial_page)
+        __crawl_page(page=initial_page)
 
         self.driver.close()
 
@@ -148,3 +162,4 @@ if __name__ == "__main__":
     print("the time of execution: ", (end - start))
     print(urls)
     print(f"url length {len(urls)}")
+    print(f"faq disco updated: {disco}")

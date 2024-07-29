@@ -9,6 +9,6 @@ WORKDIR /usr/src/vectorstore_updater_app
 
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry install --no-root
+RUN poetry install
 
 COPY . /usr/src/vectorstore_updater_app/

@@ -131,8 +131,8 @@ class KnowledgeDriver:
         self.driver.implicitly_wait(10)  # Wait for the page to load
         page = self.driver.find_elements(By.CSS_SELECTOR, 'pre')  # Replace with actual CSS selector for threads
         data = json.loads(page[0].text)
-        logger.warning(f"Data: {data}")
         if isinstance(data, dict) and data.get("message") == '401: Unauthorized':
+            logger.critical(f"Discord unauthorized!")
             return False
         path = os.path.join("vectorstore_updater_app", "knowledge", f"{protocol_name}_discord.txt")
         with open(path, "w") as file:

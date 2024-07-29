@@ -102,7 +102,10 @@ def __update_knowledge_logic():
         faq_result = False
         if faq_link:
             faq_result = kd.update_discord_faq(link=faq_link, protocol_name=tag)
-            logging.critical("Can't update FAQ!")
+            if not faq_result:
+                logging.warning("Can't update FAQ!")
+            else:
+                logging.info("FAQ successfully updated!")
 
         if len(new_urls) > 0:
             url_str = "\n".join(new_urls)

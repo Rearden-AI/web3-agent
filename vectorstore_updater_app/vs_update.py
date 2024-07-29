@@ -6,7 +6,7 @@ from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoade
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .modules_factory import redis_db, tg_bot, kd
+from .modules_factory import tg_bot, kd
 from .vectorstore import vector_store
 
 logger = logging.getLogger('vs_update')

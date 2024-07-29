@@ -2,7 +2,7 @@ import os
 import logging
 from operator import itemgetter
 
-from langchain_community.document_loaders import AsyncHtmlLoader, DirectoryLoader
+from langchain_community.document_loaders import AsyncHtmlLoader, TextLoader
 from langchain_community.document_transformers import Html2TextTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -44,9 +44,9 @@ def update_vectorstore_urls(url_list: list, tag: str, is_faq_updated: bool = Fal
     docs = html2text.transform_documents(docs)
 
     if is_faq_updated:
-        knowledge_dir_path = os.path.realpath(
+        knowledge_filepath = os.path.realpath(
             os.path.join("vectorstore_updater_app", "knowledge", f"{tag}_discord.txt"))
-        txt_docs = DirectoryLoader(path=knowledge_dir_path).load()
+        txt_docs = TextLoader(file_path=knowledge_filepath).load()
         docs += txt_docs
 
     for doc in docs:

@@ -2,7 +2,7 @@ services:
   vs-updater:
     build:
       context: ../
-      dockerfile: Dockerfile-vs-upddater
+      dockerfile: ../Dockerfile-vs-updater
     env_file:
       - ../.envs/.dev
     image:

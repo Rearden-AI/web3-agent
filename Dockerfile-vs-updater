@@ -18,4 +18,4 @@ COPY . /usr/src/vectorstore_updater_app/
 EXPOSE 8000
 
 # Run Uvicorn server
-CMD ["poetry", "run", "uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]

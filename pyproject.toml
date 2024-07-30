@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "pyproject"}]
 
 [tool.poetry.dependencies]
-python = "==3.11.0"
+python = ">=3.11,<3.13"
 aiohttp = "^3.9.5"
 aiomysql = "^0.2.0"
 aioredis = "^2.0.1"

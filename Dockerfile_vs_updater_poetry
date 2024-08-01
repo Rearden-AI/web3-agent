@@ -9,9 +9,7 @@ WORKDIR /usr/src/vectorstore_updater_app
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry install
-RUN poetry shell
-
-ENV VIRTUAL_ENV=/usr/src/vectorstore_updater_app/.venv \
-    PATH="/usr/src/vectorstore_updater_app/.venv/bin:$PATH"
 
 COPY . /usr/src/vectorstore_updater_app/
+
+CMD ["poetry", "run", "uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]

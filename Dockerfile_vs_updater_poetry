@@ -13,4 +13,4 @@ RUN poetry install
 COPY . /usr/src/vectorstore_updater_app/
 
 # Run Uvicorn server
-ENTRYPOINT ["poetry", "run", "/usr/local/bin/uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]
+ENTRYPOINT ["uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]

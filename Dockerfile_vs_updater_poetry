@@ -12,4 +12,4 @@ RUN poetry install
 
 COPY . /usr/src/vectorstore_updater_app/
 
-CMD ["poetry", "run", "uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]
+CMD ["poetry", "run", "/usr/src/vectorstore_updater_app/.venv/bin/uvicorn", "vs_main:vectorstore_updater_app", "--proxy-headers", "--host", "0.0.0.0"]

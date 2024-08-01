@@ -2,7 +2,7 @@ services:
   vs-updater:
     build:
       context: ../
-      dockerfile: Dockerfile-vs-updater
+      dockerfile: Dockerfile_vs_updater_poetry
     env_file:
       - ../.envs/.dev
     image:
@@ -16,7 +16,7 @@ services:
     volumes:
       - ../:/usr/src/vectorstore_updater_app
     restart: always
-    command: bash -c 'uvicorn vs_main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
+#    command: bash -c 'uvicorn vs_main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
     hostname: vs-updater
 
   chroma:

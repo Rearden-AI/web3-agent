@@ -16,7 +16,7 @@ services:
     volumes:
       - ../:/usr/src/vectorstore_updater_app
     restart: always
-#    command: bash -c 'uvicorn vs_main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
+    command: bash -c '/usr/src/vectorstore_updater_app/.venv/bin/uvicorn vs_main:vectorstore_updater_app --proxy-headers --host 0.0.0.0'
     hostname: vs-updater
 
   chroma:

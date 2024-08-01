@@ -9,8 +9,9 @@ WORKDIR /usr/src/vectorstore_updater_app
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry install
+RUN poetry shell
 
-ENV VIRTUAL_ENV=/vectorstore_updater_app/.venv \
-    PATH="/vectorstore_updater_app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/usr/src/vectorstore_updater_app/.venv \
+    PATH="/usr/src/vectorstore_updater_app/.venv/bin:$PATH"
 
 COPY . /usr/src/vectorstore_updater_app/
